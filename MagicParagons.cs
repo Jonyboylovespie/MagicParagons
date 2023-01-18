@@ -24,6 +24,7 @@ using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities.Behaviors;
 using Il2CppAssets.Scripts.Utils;
 using BTD_Mod_Helper.Api.Enums;
+using Il2CppAssets.Scripts.Models.Towers.Behaviors;
 
 [assembly: MelonInfo(typeof(MagicParagons.Main), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
@@ -124,12 +125,27 @@ namespace MagicParagons
                     attackModelMAINATTACK.GetDescendants<DamageOverTimeModel>().ForEach(interval => interval.interval = 0.1f);
                     towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-050").GetBehaviors<AbilityModel>().First().Duplicate());
                     var abilityModel = towerModel.GetAbility();
-                    abilityModel.GetDescendants<AttackModel>().ForEach(range => range.range = towerModel.range);
+                    abilityModel.GetBehavior<MorphTowerModel>().maxCost = 999999999f;
+                    abilityModel.GetBehavior<MorphTowerModel>().maxTowers = 999999;
+                    abilityModel.GetBehavior<MorphTowerModel>().maxTier = 4;
+                    abilityModel.GetBehavior<MorphTowerModel>().affectList = "DartMonkey, BoomerangMonkey, BombShooter, TackShooter, IceMonkey, GlueGunner, SniperMonkey, DartlingGunner, WizardMonkey, NinjaMonkey, Alchemist, Druid, EngineerMonkey";
+                    abilityModel.GetDescendants<AttackModel>().ForEach(range => range.range = 99999999999f);
                     abilityModel.GetDescendants<DamageModel>().ForEach(damage => damage.damage = 1000f);
                     abilityModel.cooldown = 180;
                     abilityModel.GetDescendants<ProjectileModel>().ForEach(pierce => pierce.pierce = 1000f);
                     abilityModel.GetDescendants<ProjectileModel>().ForEach(aimbot => aimbot.AddBehavior(new TrackTargetWithinTimeModel("aimbot", 999999f, true, false, 144f, false, 99999999f, false, 3.47999978f, true)));
                     abilityModel.GetDescendants<ProjectileModel>().ForEach(proj => proj.ApplyDisplay<MONKELASERS>());
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<AttackModel>().ForEach(range => range.range = 99999999999f);
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<DamageModel>().ForEach(damage => damage.damage = 1000f);
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<ProjectileModel>().ForEach(pierce => pierce.pierce = 1000f);
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<ProjectileModel>().ForEach(aimbot => aimbot.AddBehavior(new TrackTargetWithinTimeModel("aimbot", 999999f, true, false, 144f, false, 99999999f, false, 3.47999978f, true)));
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<ProjectileModel>().ForEach(proj => proj.ApplyDisplay<MONKELASERS>());
+                    abilityModel.GetBehavior<MorphTowerModel>().secondaryTowerModel.range = 99999999999f;
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.range = 99999999999f;
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<FilterInvisibleModel>().ForEach(filter => filter.isActive = false);
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<AttackModel>().ForEach(filter => filter.attackThroughWalls = true);
+                    abilityModel.GetDescendants<TravelStraitModel>().ForEach(travels => travels.lifespan = 2);
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<TravelStraitModel>().ForEach(travels => travels.lifespan = 2);
 
 
 
@@ -148,8 +164,15 @@ namespace MagicParagons
                     foreach (var renderer in node.genericRenderers)
                     {
                         renderer.SetOutlineColor(new Color(15f / 255, 50f / 255, 89f / 255));
+                        if (renderer == node.genericRenderers.Last())
+                        {
+
+                        }
+                        else
+                        {
+                            renderer.material.mainTexture = GetTexture("AlchemistParagonDisplay");
+                        }
                     }
-                    node.genericRenderers.First().material.mainTexture = GetTexture("AlchemistParagonDisplay");
                 }
             }
             public class MONKELASERS : ModDisplay
@@ -163,6 +186,42 @@ namespace MagicParagons
             public class PermaBrewIcon : ModBuffIcon
             {
                 public new virtual SpriteReference IconReference  => (SpriteReference)VanillaSprites.PermanentBrewUpgradeIcon;
+            }
+        }
+        public class WizardParagon
+        {
+            public class GrandMagus : ModVanillaParagon
+            {
+                public override string BaseTower => "WizardMonkey-500";
+                public override string Name => "WizardMonkey";
+            }
+            public class GrandMagusUpgrade : ModParagonUpgrade<GrandMagus>
+            {
+                public override int Cost => 0;
+                public override string Description => "Unravel the mysteries of the arcane arts and see for yourself why they are kept secret.";
+                public override string DisplayName => "Grand Magus";
+                public override string Icon => "WizardParagonIcon";
+                public override string Portrait => "WizardParagonPortrait";
+                public override void ApplyUpgrade(TowerModel towerModel)
+                {
+                    var attackModel = towerModel.GetAttackModel();
+                }
+            }
+            public class GrandMagusDisplay : ModTowerDisplay<GrandMagus>
+            {
+                public override string BaseDisplay => GetDisplay("WizardMonkey", 5, 0, 0);
+                public override bool UseForTower(int[] tiers)
+                {
+                    return IsParagon(tiers);
+                }
+                public override int ParagonDisplayIndex => 0;
+                public override void ModifyDisplayNode(UnityDisplayNode node)
+                {
+                    foreach (var renderer in node.genericRenderers)
+                    {
+                        renderer.SetOutlineColor(new Color(235f / 255, 99f / 255, 14f / 255));
+                    }
+                }
             }
         }
     }
