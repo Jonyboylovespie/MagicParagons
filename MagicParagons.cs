@@ -1,4 +1,4 @@
-﻿using Il2CppAssets.Scripts.Models.Towers;
+using Il2CppAssets.Scripts.Models.Towers;
 using Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors;
 using Il2CppAssets.Scripts.Unity;
 using Il2CppAssets.Scripts.Unity.Display;
@@ -25,6 +25,7 @@ using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities.Behaviors;
 using Il2CppAssets.Scripts.Utils;
 using BTD_Mod_Helper.Api.Enums;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors;
+using Il2CppAssets.Scripts.Models.GenericBehaviors;
 
 [assembly: MelonInfo(typeof(MagicParagons.Main), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
@@ -97,6 +98,7 @@ namespace MagicParagons
                 public override string Portrait => "AlchemistParagonPortrait";
                 public override void ApplyUpgrade(TowerModel towerModel)
                 {
+                    towerModel.displayScale = 1.5f;
                     towerModel.range = 100;
                     towerModel.RemoveBehaviors<AttackModel>();
                     towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-500").GetBehaviors<AttackModel>().Last().Duplicate());
@@ -108,6 +110,7 @@ namespace MagicParagons
                     attackModelBREW.GetDescendants<AddBerserkerBrewToProjectileModel>().ForEach(range => range.rangeUp = 1);
                     towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-005").GetBehaviors<AttackModel>().Last().Duplicate());
                     var attackModelREDTRANSFORM = towerModel.GetAttackModels()[1];
+                    attackModelREDTRANSFORM.GetDescendants<ProjectileModel>().ForEach(pierce => pierce.pierce = 10);
                     attackModelREDTRANSFORM.GetDescendants<WeaponModel>().ForEach(rate => rate.rate = 2);
                     towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-015").GetBehaviors<AttackModel>().First().Duplicate());
                     var attackModelACIDPOOL = towerModel.GetAttackModels()[2];
@@ -146,6 +149,7 @@ namespace MagicParagons
                     abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<AttackModel>().ForEach(filter => filter.attackThroughWalls = true);
                     abilityModel.GetDescendants<TravelStraitModel>().ForEach(travels => travels.lifespan = 2);
                     abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<TravelStraitModel>().ForEach(travels => travels.lifespan = 2);
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.ApplyDisplay<MonkeTransformation>();
 
 
 
@@ -181,6 +185,17 @@ namespace MagicParagons
                 public override void ModifyDisplayNode(UnityDisplayNode node)
                 {
                     Set2DTexture(node, "AlchemistParagonLasersDisplay");
+                }
+            }
+            public class MonkeTransformation : ModDisplay
+            {
+                public override string BaseDisplay => "c2ca641e5b2249a47b1e6f7dd53db1db";
+                public override void ModifyDisplayNode(UnityDisplayNode node)
+                {
+                    foreach (var renderer in node.genericRenderers)
+                    {
+                        renderer.material.mainTexture = GetTexture("AlchemistParagonDisplay");
+                    }
                 }
             }
             public class PermaBrewIcon : ModBuffIcon
