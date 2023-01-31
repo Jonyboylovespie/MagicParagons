@@ -1,4 +1,4 @@
-using Il2CppAssets.Scripts.Models.Towers;
+﻿using Il2CppAssets.Scripts.Models.Towers;
 using Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors;
 using Il2CppAssets.Scripts.Unity;
 using Il2CppAssets.Scripts.Unity.Display;
@@ -26,6 +26,10 @@ using Il2CppAssets.Scripts.Utils;
 using BTD_Mod_Helper.Api.Enums;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors;
 using Il2CppAssets.Scripts.Models.GenericBehaviors;
+using Il2CppAssets.Scripts.Unity.Towers.Mods;
+using System.Collections.Generic;
+using static MagicParagons.Main.AlchemistParagon;
+using System.Security.Permissions;
 
 [assembly: MelonInfo(typeof(MagicParagons.Main), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
@@ -98,6 +102,7 @@ namespace MagicParagons
                 public override string Portrait => "AlchemistParagonPortrait";
                 public override void ApplyUpgrade(TowerModel towerModel)
                 {
+                    var icon = GetInstance<AlchemistBuffIcon>();
                     towerModel.displayScale = 1.5f;
                     towerModel.range = 100;
                     towerModel.RemoveBehaviors<AttackModel>();
@@ -105,13 +110,15 @@ namespace MagicParagons
                     var attackModelBREW = towerModel.GetAttackModels()[0];
                     attackModelBREW.range = towerModel.range;
                     attackModelBREW.GetDescendants<WeaponModel>().ForEach(weapon => weapon.rate = 0.2f);
+                    attackModelBREW.GetDescendant<AddBerserkerBrewToProjectileModel>().buffIconName = icon.Id;
+                    attackModelBREW.GetDescendant<AddBerserkerBrewToProjectileModel>().buffLocsName = icon.Icon;
                     attackModelBREW.GetDescendants<AddBerserkerBrewToProjectileModel>().ForEach(damage => damage.damageUp = 5);
-                    attackModelBREW.GetDescendants<AddBerserkerBrewToProjectileModel>().ForEach(rate => rate.rateUp = 0.3f);
+                    attackModelBREW.GetDescendants<AddBerserkerBrewToProjectileModel>().ForEach(damage => damage.pierceUp = 20);
+                    attackModelBREW.GetDescendants<AddBerserkerBrewToProjectileModel>().ForEach(rate => rate.rateUp = 0.2f);
                     attackModelBREW.GetDescendants<AddBerserkerBrewToProjectileModel>().ForEach(range => range.rangeUp = 1);
                     towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-005").GetBehaviors<AttackModel>().Last().Duplicate());
                     var attackModelREDTRANSFORM = towerModel.GetAttackModels()[1];
-                    attackModelREDTRANSFORM.GetDescendants<ProjectileModel>().ForEach(pierce => pierce.pierce = 10);
-                    attackModelREDTRANSFORM.GetDescendants<WeaponModel>().ForEach(rate => rate.rate = 2);
+                    attackModelREDTRANSFORM.GetDescendant<WeaponModel>().rate = 0.86f;
                     towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-015").GetBehaviors<AttackModel>().First().Duplicate());
                     var attackModelACIDPOOL = towerModel.GetAttackModels()[2];
                     attackModelACIDPOOL.GetDescendants<ProjectileModel>().ForEach(pierce => pierce.pierce = 200);
@@ -156,6 +163,10 @@ namespace MagicParagons
                     towerModel.GetDescendants<FilterInvisibleModel>().ForEach(filter => filter.isActive = false);
                     towerModel.GetDescendants<DamageModel>().ForEach(immune => immune.immuneBloonProperties = Il2Cpp.BloonProperties.None);
                 }
+            }
+            public class AlchemistBuffIcon : ModBuffIcon
+            {
+                public override string Icon => GetTextureGUID("AlchemistParagonBuffIcon");
             }
             public class HyperScienceDisplay : ModTowerDisplay<HyperScience>
             {
@@ -219,21 +230,36 @@ namespace MagicParagons
                 public override string Portrait => "WizardParagonPortrait";
                 public override void ApplyUpgrade(TowerModel towerModel)
                 {
-                    var attackModel = towerModel.GetAttackModel();
+                    towerModel.displayScale = 2;
+                    towerModel.range = 75;
+                    towerModel.RemoveBehaviors<AttackModel>();
+                    towerModel.AddBehavior(new TowerCreateTowerModel("Praying this works", Game.instance.model.GetTowerFromId("WizardMonkey-050").GetBehavior<TowerCreateTowerModel>().towerModel.Duplicate(), true));
+                    var PhoenixModel = towerModel.GetBehavior<TowerCreateTowerModel>().towerModel;
+                    PhoenixModel.GetDescendant<DamageModel>().damage = 15;
+                    PhoenixModel.GetDescendant<WeaponModel>().rate = 0.1f;
+
+                    var towerdisplay = towerModel.display.guidRef;
+                    var phoenixmodeldisplay = PhoenixModel.display.guidRef;
+
+                    MelonLogger.Msg("The tower display = " + towerdisplay);
+                    MelonLogger.Msg("The phoenixmodel display = " + phoenixmodeldisplay);
+
+
+                    towerModel.GetDescendants<FilterInvisibleModel>().ForEach(filter => filter.isActive = false);
+                    towerModel.GetDescendants<DamageModel>().ForEach(immune => immune.immuneBloonProperties = Il2Cpp.BloonProperties.None);
                 }
             }
             public class GrandMagusDisplay : ModTowerDisplay<GrandMagus>
             {
-                public override string BaseDisplay => GetDisplay("WizardMonkey", 5, 0, 0);
+                public override string BaseDisplay => GetDisplay("WizardMonkey", 0, 3, 0);
                 public override bool UseForTower(int[] tiers)
-                {
-                    return IsParagon(tiers);
-                }
+                { return IsParagon(tiers); }
                 public override int ParagonDisplayIndex => 0;
                 public override void ModifyDisplayNode(UnityDisplayNode node)
                 {
                     foreach (var renderer in node.genericRenderers)
                     {
+                        renderer.material.mainTexture = GetTexture("WizardParagonDisplay");
                         renderer.SetOutlineColor(new Color(235f / 255, 99f / 255, 14f / 255));
                     }
                 }

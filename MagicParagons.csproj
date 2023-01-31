@@ -45,12 +45,16 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.png" />
-    <EmbeddedResource Include="Displays\AlchemistParagonDisplays\AlchemistParagonIcon.png" />
+	<EmbeddedResource Include="Displays\AlchemistParagonDisplays\AlchemistParagonIcon.png" />
+    <EmbeddedResource Include="Displays\AlchemistParagonDisplays\AlchemistParagonBuffIcon.png" />
     <EmbeddedResource Include="Displays\AlchemistParagonDisplays\AlchemistParagonPortrait.png" />
     <EmbeddedResource Include="Displays\AlchemistParagonDisplays\AlchemistParagonDisplay.png" />
-	<EmbeddedResource Include="Displays\AlchemistParagonDisplays\AlchemistParagonLasersDisplay.png" />
+    <EmbeddedResource Include="Displays\AlchemistParagonDisplays\AlchemistParagonLasersDisplay.png" />
     <EmbeddedResource Include="Displays\DruidParagonDisplays\DruidParagonIcon.png" />
     <EmbeddedResource Include="Displays\DruidParagonDisplays\DruidParagonPortrait.png" />
+    <EmbeddedResource Include="Displays\WizardParagonDisplays\WizardParagonIcon.png" />
+    <EmbeddedResource Include="Displays\WizardParagonDisplays\WizardParagonPortrait.png" />
+	<EmbeddedResource Include="Displays\WizardParagonDisplays\WizardParagonDisplay.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
