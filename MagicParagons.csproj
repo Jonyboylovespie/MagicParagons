@@ -14,6 +14,8 @@
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,7 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.png" />
-	<EmbeddedResource Include="Displays\AlchemistParagonDisplays\AlchemistParagonIcon.png" />
+    <EmbeddedResource Include="Displays\AlchemistParagonDisplays\AlchemistParagonIcon.png" />
     <EmbeddedResource Include="Displays\AlchemistParagonDisplays\AlchemistParagonBuffIcon.png" />
     <EmbeddedResource Include="Displays\AlchemistParagonDisplays\AlchemistParagonPortrait.png" />
     <EmbeddedResource Include="Displays\AlchemistParagonDisplays\AlchemistParagonDisplay.png" />
@@ -54,7 +56,8 @@
     <EmbeddedResource Include="Displays\DruidParagonDisplays\DruidParagonPortrait.png" />
     <EmbeddedResource Include="Displays\WizardParagonDisplays\WizardParagonIcon.png" />
     <EmbeddedResource Include="Displays\WizardParagonDisplays\WizardParagonPortrait.png" />
-	<EmbeddedResource Include="Displays\WizardParagonDisplays\WizardParagonDisplay.png" />
+    <EmbeddedResource Include="Displays\WizardParagonDisplays\WizardParagonDisplay.png" />
+    <EmbeddedResource Include="Displays\WizardParagonDisplays\WizardParagonPhoenixDisplay.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -81,9 +84,14 @@
       <HintPath>..\..\Program Files (x86)\Steam\steamapps\common\BloonsTD6\MelonLoader\net35\MelonLoader.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="Unity.ResourceManager, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Program Files (x86)\Steam\steamapps\common\BloonsTD6\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Program Files (x86)\Steam\steamapps\common\BloonsTD6\MelonLoader\Il2CppAssemblies\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

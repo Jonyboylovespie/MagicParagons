@@ -6,8 +6,6 @@ using BTD_Mod_Helper;
 using BTD_Mod_Helper.Api.Display;
 using BTD_Mod_Helper.Api.Towers;
 using BTD_Mod_Helper.Extensions;
-using BTD_Mod_Helper.Api.ModOptions;
-using BTD_Mod_Helper.Api.Data;
 using BTD_Mod_Helper.Api.Components;
 using MelonLoader;
 using ModHelperData = MagicParagons.ModHelperData;
@@ -25,11 +23,9 @@ using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities.Behaviors;
 using Il2CppAssets.Scripts.Utils;
 using BTD_Mod_Helper.Api.Enums;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors;
-using Il2CppAssets.Scripts.Models.GenericBehaviors;
-using Il2CppAssets.Scripts.Unity.Towers.Mods;
-using System.Collections.Generic;
-using static MagicParagons.Main.AlchemistParagon;
-using System.Security.Permissions;
+using Il2CppAssets.Scripts.Models.TowerSets;
+using Il2CppAssets.Scripts.Unity.UI_New.Popups;
+using Il2CppAssets.Scripts.SimulationTests;
 
 [assembly: MelonInfo(typeof(MagicParagons.Main), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
@@ -38,13 +34,9 @@ namespace MagicParagons
 {
     public class Main : BloonsTD6Mod
     {
-        public override void OnNewGameModel(GameModel gameModel, Il2CppSystem.Collections.Generic.List<ModModel> mods)
-        {
-            
-        }
         public override void OnTitleScreen()
         {
-
+            
         }
         public override void OnApplicationStart()
         {
@@ -158,8 +150,6 @@ namespace MagicParagons
                     abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<TravelStraitModel>().ForEach(travels => travels.lifespan = 2);
                     abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.ApplyDisplay<MonkeTransformation>();
 
-
-
                     towerModel.GetDescendants<FilterInvisibleModel>().ForEach(filter => filter.isActive = false);
                     towerModel.GetDescendants<DamageModel>().ForEach(immune => immune.immuneBloonProperties = Il2Cpp.BloonProperties.None);
                 }
@@ -211,7 +201,7 @@ namespace MagicParagons
             }
             public class PermaBrewIcon : ModBuffIcon
             {
-                public new virtual SpriteReference IconReference  => (SpriteReference)VanillaSprites.PermanentBrewUpgradeIcon;
+                public new virtual SpriteReference IconReference => (SpriteReference)VanillaSprites.PermanentBrewUpgradeIcon;
             }
         }
         public class WizardParagon
@@ -223,6 +213,8 @@ namespace MagicParagons
             }
             public class GrandMagusUpgrade : ModParagonUpgrade<GrandMagus>
             {
+                private TowerSet towerSet;
+
                 public override int Cost => 0;
                 public override string Description => "Unravel the mysteries of the arcane arts and see for yourself why they are kept secret.";
                 public override string DisplayName => "Grand Magus";
@@ -230,31 +222,63 @@ namespace MagicParagons
                 public override string Portrait => "WizardParagonPortrait";
                 public override void ApplyUpgrade(TowerModel towerModel)
                 {
+                    towerModel.towerSelectionMenuThemeId = "UnpoppedArmy";
                     towerModel.displayScale = 2;
                     towerModel.range = 75;
                     towerModel.RemoveBehaviors<AttackModel>();
-                    towerModel.AddBehavior(new TowerCreateTowerModel("Praying this works", Game.instance.model.GetTowerFromId("WizardMonkey-050").GetBehavior<TowerCreateTowerModel>().towerModel.Duplicate(), true));
+
+                    towerModel.AddBehavior(new TowerCreateTowerModel("Praying this works", Game.instance.model.GetTowerFromId("WizardMonkey-050").GetDescendant<TowerCreateTowerModel>().towerModel, true));
+                    //towerModel.AddBehavior(new TowerCreateTowerModel("Praying this works", Game.instance.model.GetTowerFromId("DartMonkey-050"), true));
                     var PhoenixModel = towerModel.GetBehavior<TowerCreateTowerModel>().towerModel;
                     PhoenixModel.GetDescendant<DamageModel>().damage = 15;
                     PhoenixModel.GetDescendant<WeaponModel>().rate = 0.1f;
+                    PhoenixModel.GetDescendant<ProjectileModel>().ApplyDisplay<SmolBall>();
+                    PhoenixModel.GetDescendant<ProjectileModel>().scale = 0.3f;
 
-                    var towerdisplay = towerModel.display.guidRef;
-                    var phoenixmodeldisplay = PhoenixModel.display.guidRef;
-
-                    MelonLogger.Msg("The tower display = " + towerdisplay);
-                    MelonLogger.Msg("The phoenixmodel display = " + phoenixmodeldisplay);
-
+                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("WizardMonkey-005").GetBehaviors<AttackModel>().Last().Duplicate());
+                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("WizardMonkey-005").GetBehavior<NecromancerZoneModel>().Duplicate());
+                    var NecromancerModel = towerModel.GetAttackModels()[0];
 
                     towerModel.GetDescendants<FilterInvisibleModel>().ForEach(filter => filter.isActive = false);
                     towerModel.GetDescendants<DamageModel>().ForEach(immune => immune.immuneBloonProperties = Il2Cpp.BloonProperties.None);
                 }
             }
-            public class GrandMagusDisplay : ModTowerDisplay<GrandMagus>
+            public class SmolBall : ModDisplay
             {
-                public override string BaseDisplay => GetDisplay("WizardMonkey", 0, 3, 0);
-                public override bool UseForTower(int[] tiers)
+                public override string BaseDisplay => "7e672209db39b9e4db63c13dbe11cad5";
+                public override void ModifyDisplayNode(UnityDisplayNode node)
+                {
+                    Set2DTexture(node, "WizardParagonIcon");
+                }
+            }
+            public class GrandMagusPhoenixDisplay : ModTowerDisplay<GrandMagus>
+            {
+                public override string BaseDisplay => "1e5aa5cc44941da43a90880b50d5d112";
+                public override bool UseForTower(int[] tiers)    
                 { return IsParagon(tiers); }
                 public override int ParagonDisplayIndex => 0;
+                public override void ModifyDisplayNode(UnityDisplayNode node)
+                {
+                    foreach (var renderer in node.genericRenderers)
+                    {
+                        if (renderer == node.genericRenderers.First())
+                        {
+                            renderer.material.mainTexture = GetTexture("WizardParagonPhoenixDisplay");
+                            renderer.SetOutlineColor(new Color(1f / 255, 109f / 255, 130f / 255));
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                }
+            }
+            public class GrandMagusDisplay : ModDisplay
+            {
+                public override string BaseDisplay => GetDisplay("WizardMonkey", 0, 3, 0);
+                //public override bool UseForTower(int[] tiers)
+                //{ return IsParagon(tiers); }
+                //public override int ParagonDisplayIndex => 0;
                 public override void ModifyDisplayNode(UnityDisplayNode node)
                 {
                     foreach (var renderer in node.genericRenderers)
@@ -265,29 +289,5 @@ namespace MagicParagons
                 }
             }
         }
-    }
-    public class Settings : ModSettings
-    {
-        
-
-        private static readonly ModSettingCategory OPParagons = new ("Toggle OP Mode of Paragons")
-        {
-            modifyCategory = category =>
-            {
-
-            }
-        };
-
-        
-
-        private static readonly ModSettingCategory ParagonCost = new("Paragon Costs")
-        {
-            modifyCategory = category =>
-            {
-
-            }
-        };
-
-        
-    }
+    } 
 }
