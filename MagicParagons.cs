@@ -12,35 +12,18 @@ using ModHelperData = MagicParagons.ModHelperData;
 using Il2CppAssets.Scripts.Models.Towers.Projectiles;
 using Il2CppAssets.Scripts.Models.Towers.Weapons;
 using Il2CppAssets.Scripts.Models.Towers.Filters;
-using Il2CppAssets.Scripts.Models;
 using Il2CppAssets.Scripts.Models.Bloons.Behaviors;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Attack;
 using System.Linq;
-using BTD_Mod_Helper.Api;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities.Behaviors;
 using Il2CppAssets.Scripts.Utils;
 using BTD_Mod_Helper.Api.Enums;
-using Harmony;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors;
-using Il2CppAssets.Scripts.Models.TowerSets;
 using Il2CppAssets.Scripts.Models.Towers.Weapons.Behaviors;
-using Il2CppAssets.Scripts.Models.GenericBehaviors;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Emissions;
-using Il2CppAssets.Scripts.Simulation.Towers;
-using Il2CppAssets.Scripts.Simulation.Objects;
-using Il2CppAssets.Scripts.Unity.UI_New.InGame;
-using Il2CppAssets.Scripts;
-using static MagicParagons.Main.SuperMonkeyParagon;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Attack.Behaviors;
-using Il2CppAssets.Scripts.Unity.Bridge;
-using Il2CppAssets.Scripts.Unity.UI_New;
-using Il2CppAssets.Scripts.Unity.UI_New.InGame.TowerSelectionMenu.TowerSelectionMenuThemes;
-using Il2CppSystem.Collections.Generic;
-using MagicParagons;
-using UnityEngine;
 using Color = UnityEngine.Color;
-using Vector3 = Il2CppAssets.Scripts.Simulation.SMath.Vector3;
 
 [assembly: MelonInfo(typeof(MagicParagons.Main), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
@@ -49,18 +32,11 @@ namespace MagicParagons
 {
     public class Main : BloonsTD6Mod
     {
-        public static bool VTSGDown;
         public static string[] towersToIgnore = { "" };
-        public static List<String> TowerGuidsDown = new();
 
         public override void OnApplicationStart()
         {
             MelonLogger.Msg(System.ConsoleColor.Magenta, "Magic Paragons Loaded!");
-        }
-
-        public override void OnTitleScreen()
-        {
-
         }
 
         public class DruidParagon
@@ -72,7 +48,7 @@ namespace MagicParagons
 
             public class PrimordialKingUpgrade : ModParagonUpgrade<PrimordialKing>
             {
-                public override int Cost => 2300000;
+                public override int Cost => 2000000;
 
                 public override string Description =>
                     "The source of all druid magic... More powerful than any other...";
@@ -157,7 +133,7 @@ namespace MagicParagons
                     towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Druid-500").GetDescendant<AttackModel>()
                         .Duplicate());
                     var StormAttack = towerModel.GetAttackModels()[1];
-                    StormAttack.GetDescendants<DamageModel>().ForEach(damage => damage.damage *= 5);
+                    StormAttack.GetDescendants<DamageModel>().ForEach(damage => damage.damage *= 10);
                     StormAttack.GetDescendants<WeaponModel>().ForEach(weapon => weapon.rate *= 0.25f);
                     StormAttack.range = towerModel.range;
                     StormAttack.weapons[3].rate = 0.001f;
@@ -178,7 +154,7 @@ namespace MagicParagons
                     WrathAttack.GetDescendant<ProjectileModel>().pierce = 1000;
                     WrathAttack.GetDescendant<RandomEmissionModel>().count = 20;
                     WrathAttack.GetDescendant<WeaponModel>().rate = 0.1f;
-                    WrathAttack.GetDescendant<DamageModel>().damage = 250;
+                    WrathAttack.GetDescendant<DamageModel>().damage = 300;
                     towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-500")
                         .GetBehaviors<AttackModel>().Last().Duplicate());
                     var PoplustBuff = towerModel.GetAttackModels()[3];
@@ -187,7 +163,7 @@ namespace MagicParagons
                     PoplustBuff.GetDescendant<AddBerserkerBrewToProjectileModel>().buffIconName = GetInstance<DruidBuffIcon>().Id;
                     PoplustBuff.GetDescendant<AddBerserkerBrewToProjectileModel>().buffLocsName = GetInstance<DruidBuffIcon>().Icon;
                     PoplustBuff.GetDescendants<AddBerserkerBrewToProjectileModel>()
-                        .ForEach(damage => damage.damageUp = 5);
+                        .ForEach(damage => damage.damageUp = 10);
                     PoplustBuff.GetDescendants<AddBerserkerBrewToProjectileModel>()
                         .ForEach(damage => damage.pierceUp = 5);
                     PoplustBuff.GetDescendants<AddBerserkerBrewToProjectileModel>().ForEach(rate => rate.rateUp = 0.2f);
@@ -393,86 +369,60 @@ namespace MagicParagons
                     towerModel.displayScale = 1.5f;
                     towerModel.range = 100;
                     towerModel.RemoveBehaviors<AttackModel>();
-                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-500")
-                        .GetBehaviors<AttackModel>().Last().Duplicate());
+                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-500").GetBehaviors<AttackModel>().Last().Duplicate());
                     var attackModelBREW = towerModel.GetAttackModels()[0];
                     attackModelBREW.range = towerModel.range;
                     attackModelBREW.GetDescendants<WeaponModel>().ForEach(weapon => weapon.rate = 0.2f);
                     attackModelBREW.GetDescendant<AddBerserkerBrewToProjectileModel>().buffIconName = GetInstance<AlchemistBuffIcon>().Id;
                     attackModelBREW.GetDescendant<AddBerserkerBrewToProjectileModel>().buffLocsName = GetInstance<AlchemistBuffIcon>().Icon;
-                    attackModelBREW.GetDescendants<AddBerserkerBrewToProjectileModel>()
-                        .ForEach(damage => damage.damageUp = 5);
-                    attackModelBREW.GetDescendants<AddBerserkerBrewToProjectileModel>()
-                        .ForEach(damage => damage.pierceUp = 20);
-                    attackModelBREW.GetDescendants<AddBerserkerBrewToProjectileModel>()
-                        .ForEach(rate => rate.rateUp = 0.2f);
-                    attackModelBREW.GetDescendants<AddBerserkerBrewToProjectileModel>()
-                        .ForEach(range => range.rangeUp = 1);
-                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-005")
-                        .GetBehaviors<AttackModel>().Last().Duplicate());
+                    attackModelBREW.GetDescendants<AddBerserkerBrewToProjectileModel>().ForEach(damage => damage.damageUp = 5);
+                    attackModelBREW.GetDescendants<AddBerserkerBrewToProjectileModel>().ForEach(damage => damage.pierceUp = 20);
+                    attackModelBREW.GetDescendants<AddBerserkerBrewToProjectileModel>().ForEach(rate => rate.rateUp = 0.2f);
+                    attackModelBREW.GetDescendants<AddBerserkerBrewToProjectileModel>().ForEach(range => range.rangeUp = 1);
+                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-005").GetBehaviors<AttackModel>().Last().Duplicate());
                     var attackModelREDTRANSFORM = towerModel.GetAttackModels()[1];
                     attackModelREDTRANSFORM.GetDescendant<WeaponModel>().rate = 0.86f;
-                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-015")
-                        .GetBehaviors<AttackModel>().First().Duplicate());
+                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-015").GetBehaviors<AttackModel>().First().Duplicate());
                     var attackModelACIDPOOL = towerModel.GetAttackModels()[2];
                     attackModelACIDPOOL.GetDescendants<ProjectileModel>().ForEach(pierce => pierce.pierce = 200);
                     attackModelACIDPOOL.GetDescendants<AcidPoolModel>().ForEach(pierce => pierce.pierce = 200);
                     attackModelACIDPOOL.GetDescendants<DamageOverTimeModel>().ForEach(damage => damage.damage = 2);
-                    attackModelACIDPOOL.GetDescendants<DamageOverTimeModel>()
-                        .ForEach(interval => interval.interval = 0.5f);
+                    attackModelACIDPOOL.GetDescendants<DamageOverTimeModel>().ForEach(interval => interval.interval = 0.5f);
                     attackModelACIDPOOL.GetDescendants<WeaponModel>().ForEach(rate => rate.rate = 2);
-                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-050")
-                        .GetBehaviors<AttackModel>().First().Duplicate());
+                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-050").GetBehaviors<AttackModel>().First().Duplicate());
                     var attackModelMAINATTACK = towerModel.GetAttackModels()[3];
                     attackModelMAINATTACK.range = towerModel.range;
                     attackModelMAINATTACK.GetDescendants<WeaponModel>().ForEach(rate => rate.rate = 0.25f);
                     attackModelMAINATTACK.GetDescendants<DamageModel>().ForEach(damage => damage.damage = 50);
                     attackModelMAINATTACK.GetDescendants<DamageOverTimeModel>().ForEach(damage => damage.damage = 100);
-                    attackModelMAINATTACK.GetDescendants<DamageOverTimeModel>()
-                        .ForEach(interval => interval.interval = 0.1f);
-                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-050")
-                        .GetBehaviors<AbilityModel>().First().Duplicate());
+                    attackModelMAINATTACK.GetDescendants<DamageOverTimeModel>().ForEach(interval => interval.interval = 0.1f);
+                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("Alchemist-050").GetBehaviors<AbilityModel>().First().Duplicate());
                     var abilityModel = towerModel.GetAbility();
                     abilityModel.GetBehavior<MorphTowerModel>().maxCost = 999999999f;
                     abilityModel.GetBehavior<MorphTowerModel>().maxTowers = 999999;
                     abilityModel.GetBehavior<MorphTowerModel>().maxTier = 4;
-                    abilityModel.GetBehavior<MorphTowerModel>().affectList =
-                        "DartMonkey, BoomerangMonkey, BombShooter, TackShooter, IceMonkey, GlueGunner, SniperMonkey, DartlingGunner, WizardMonkey, NinjaMonkey, Alchemist, Druid, EngineerMonkey";
+                    abilityModel.GetBehavior<MorphTowerModel>().affectList = "DartMonkey, BoomerangMonkey, BombShooter, TackShooter, IceMonkey, GlueGunner, SniperMonkey, DartlingGunner, WizardMonkey, NinjaMonkey, Alchemist, Druid, EngineerMonkey";
                     abilityModel.GetDescendants<AttackModel>().ForEach(range => range.range = 99999999999f);
                     abilityModel.GetDescendants<DamageModel>().ForEach(damage => damage.damage = 1000f);
                     abilityModel.cooldown = 180;
                     abilityModel.GetDescendants<ProjectileModel>().ForEach(pierce => pierce.pierce = 1000f);
-                    abilityModel.GetDescendants<ProjectileModel>().ForEach(aimbot =>
-                        aimbot.AddBehavior(new TrackTargetWithinTimeModel("aimbot", 999999f, true, false, 144f, false,
-                            99999999f, false, 3.47999978f, true)));
+                    abilityModel.GetDescendants<ProjectileModel>().ForEach(aimbot => aimbot.AddBehavior(new TrackTargetWithinTimeModel("aimbot", 999999f, true, false, 144f, false, 99999999f, false, 3.47999978f, true)));
                     abilityModel.GetDescendants<ProjectileModel>().ForEach(proj => proj.ApplyDisplay<MONKELASERS>());
-                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel
-                        .GetDescendants<AttackModel>().ForEach(range => range.range = 99999999999f);
-                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel
-                        .GetDescendants<DamageModel>().ForEach(damage => damage.damage = 1000f);
-                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel
-                        .GetDescendants<ProjectileModel>().ForEach(pierce => pierce.pierce = 1000f);
-                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel
-                        .GetDescendants<ProjectileModel>().ForEach(aimbot =>
-                            aimbot.AddBehavior(new TrackTargetWithinTimeModel("aimbot", 999999f, true, false, 144f,
-                                false, 99999999f, false, 3.47999978f, true)));
-                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel
-                        .GetDescendants<ProjectileModel>().ForEach(proj => proj.ApplyDisplay<MONKELASERS>());
+                    abilityModel.GetBehavior<MorphTowerModel>().MorthTowerNotSelf.newTowerModel.GetDescendants<AttackModel>().ForEach(range => range.range = 99999999999f);
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<DamageModel>().ForEach(damage => damage.damage = 1000f);
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<ProjectileModel>().ForEach(pierce => pierce.pierce = 1000f);
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<ProjectileModel>().ForEach(aimbot => aimbot.AddBehavior(new TrackTargetWithinTimeModel("aimbot", 999999f, true, false, 144f, false, 99999999f, false, 3.47999978f, true)));
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<ProjectileModel>().ForEach(proj => proj.ApplyDisplay<MONKELASERS>());
                     abilityModel.GetBehavior<MorphTowerModel>().secondaryTowerModel.range = 99999999999f;
                     abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.range = 99999999999f;
-                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel
-                        .GetDescendants<FilterInvisibleModel>().ForEach(filter => filter.isActive = false);
-                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel
-                        .GetDescendants<AttackModel>().ForEach(filter => filter.attackThroughWalls = true);
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<FilterInvisibleModel>().ForEach(filter => filter.isActive = false);
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<AttackModel>().ForEach(filter => filter.attackThroughWalls = true);
                     abilityModel.GetDescendants<TravelStraitModel>().ForEach(travels => travels.lifespan = 2);
-                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel
-                        .GetDescendants<TravelStraitModel>().ForEach(travels => travels.lifespan = 2);
-                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel
-                        .ApplyDisplay<MonkeTransformation>();
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.GetDescendants<TravelStraitModel>().ForEach(travels => travels.lifespan = 2);
+                    abilityModel.GetBehavior<MorphTowerModel>().morthTowerNotSelf.newTowerModel.ApplyDisplay<MonkeTransformation>();
 
                     towerModel.GetDescendants<FilterInvisibleModel>().ForEach(filter => filter.isActive = false);
-                    towerModel.GetDescendants<DamageModel>().ForEach(immune =>
-                        immune.immuneBloonProperties = Il2Cpp.BloonProperties.None);
+                    towerModel.GetDescendants<DamageModel>().ForEach(immune => immune.immuneBloonProperties = Il2Cpp.BloonProperties.None);
                 }
             }
 
@@ -715,205 +665,6 @@ namespace MagicParagons
                     }
                 }
             }*/
-        }
-
-        public class SuperMonkeyParagon
-        {
-            public class MekhaneTheCelestial : ModVanillaParagon
-            {
-                public override string BaseTower => "SuperMonkey-010";
-            }
-
-            public class MekhaneTheCelestialUpgrade : ModParagonUpgrade<MekhaneTheCelestial>
-            {
-                public override int Cost => 10000000;
-                public override string Description => "The guardian of the stars, asteroids, sun, chaos, darkness, and most of all... monkeys";
-                public override string DisplayName => "Mekhane The Celestial";
-                public override string Icon => "SuperMonkeyParagonIcon";
-                public override string Portrait => "SuperMonkeyParagonPortrait";
-
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
-                    towerModel.ignoreBlockers = true;
-                    towerModel.range = 160;
-                    towerModel.RemoveBehavior<AttackModel>();
-                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("SuperMonkey-050").GetBehaviors<AttackModel>().First().Duplicate());
-                    var RightArm = towerModel.GetAttackModels()[0];
-                    RightArm.GetDescendant<DisplayModel>().ApplyDisplay<RightArmDisplay>();
-                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("SuperMonkey-050").GetBehaviors<AttackModel>().Last().Duplicate());
-                    var LeftArm = towerModel.GetAttackModels()[1];
-                    LeftArm.GetDescendant<DisplayModel>().ApplyDisplay<LeftArmDisplay>();
-                    foreach (var attack in towerModel.GetAttackModels())
-                    {
-                        attack.weapons[0].projectile.ApplyDisplay<ProjDisplay>();
-                        attack.weapons[0].projectile.GetBehavior<DisplayModel>().positionOffset = new Vector3(-10);
-                        attack.weapons[0].projectile.scale *= 2;
-                        attack.weapons[0].GetBehavior<CritMultiplierModel>().displayModel.ApplyDisplay<ProjDisplay>();
-                        attack.weapons[0].GetBehavior<CritMultiplierModel>().displayModel.scale *= 2;
-                        attack.weapons[0].projectile.pierce *= 100;
-                    }
-
-                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("SuperMonkey-005").GetBehavior<AbilityModel>().Duplicate());
-                    towerModel.GetBehavior<AbilityModel>().cooldown = 0.00000000001f;
-                    towerModel.AddBehavior(Game.instance.model.GetTowerFromId("SuperMonkey-050").GetBehavior<AbilityModel>());
-                    towerModel.GetBehaviors<AbilityModel>().Last().cooldown = 5;
-                    towerModel.GetBehaviors<AbilityModel>().Last().GetDescendant<DamageModel>().damage = 200000;
-
-                    towerModel.GetDescendants<ProjectileModel>().ForEach(projectile => projectile.ignoreBlockers = true);
-                    towerModel.GetDescendants<AttackModel>().ForEach(attack => attack.range = towerModel.range);
-                    towerModel.GetDescendants<AttackModel>().ForEach(attack => attack.attackThroughWalls = true);
-                    towerModel.GetDescendants<FilterInvisibleModel>().ForEach(filter => filter.isActive = false);
-                    towerModel.GetDescendants<DamageModel>().ForEach(immune => immune.immuneBloonProperties = Il2Cpp.BloonProperties.None); towerModel.displayScale = 1.5f;
-                }
-            }
-
-            public class MekhaneTheCelestialDisplay : ModTowerDisplay<MekhaneTheCelestial>
-            {
-                public override string BaseDisplay => GetDisplay("SuperMonkey", 0, 0, 5);
-
-                public override bool UseForTower(int[] tiers)
-                {
-                    return IsParagon(tiers);
-                }
-
-                public override int ParagonDisplayIndex => 0;
-
-                public override void ModifyDisplayNode(UnityDisplayNode node)
-                {
-                    foreach (var renderer in node.genericRenderers)
-                    {
-                        renderer.material.mainTexture = GetTexture("SuperMonkeyParagonBodyDisplay");
-                    }
-                }
-            }
-
-            public class MekhaneTheCelestialDisplayVengful : ModDisplay
-            {
-                public override string BaseDisplay => GetDisplay("SuperMonkey", 0, 0, 5);
-
-                public override void ModifyDisplayNode(UnityDisplayNode node)
-                {
-                    foreach (var renderer in node.genericRenderers)
-                    {
-                        renderer.material.mainTexture = GetTexture("SuperMonkeyParagonBodyDisplayVengful");
-                    }
-                }
-            }
-
-            public class LeftArmDisplay : ModDisplay
-            {
-                public override string BaseDisplay => "8a151c6c111ff5641882e51afc28c740";
-
-                public override void ModifyDisplayNode(UnityDisplayNode node)
-                {
-                    foreach (var renderer in node.genericRenderers)
-                    {
-                        renderer.material.mainTexture = GetTexture("SuperMonkeyParagonLeftArmDisplay");
-                    }
-                }
-            }
-
-            public class LeftArmDisplayVengful : ModDisplay
-            {
-                public override string BaseDisplay => "8a151c6c111ff5641882e51afc28c740";
-
-                public override void ModifyDisplayNode(UnityDisplayNode node)
-                {
-                    foreach (var renderer in node.genericRenderers)
-                    {
-                        renderer.material.mainTexture = GetTexture("SuperMonkeyParagonLeftArmDisplayVengful");
-                    }
-                }
-            }
-
-            public class RightArmDisplay : ModDisplay
-            {
-                public override string BaseDisplay => "fdff998beaa71ee45977df86cfda6d96";
-
-                public override void ModifyDisplayNode(UnityDisplayNode node)
-                {
-                    foreach (var renderer in node.genericRenderers)
-                    {
-                        renderer.material.mainTexture = GetTexture("SuperMonkeyParagonRightArmDisplay");
-                    }
-                }
-            }
-
-            public class RightArmDisplayVengful : ModDisplay
-            {
-                public override string BaseDisplay => "fdff998beaa71ee45977df86cfda6d96";
-
-                public override void ModifyDisplayNode(UnityDisplayNode node)
-                {
-                    foreach (var renderer in node.genericRenderers)
-                    {
-                        renderer.material.mainTexture = GetTexture("SuperMonkeyParagonRightArmDisplayVengful");
-                    }
-                }
-            }
-            
-            public class ProjDisplay : ModDisplay
-            {
-                public override string BaseDisplay => Generic2dDisplay;
-
-                public override void ModifyDisplayNode(UnityDisplayNode node)
-                {
-                    Set2DTexture(node, "SuperMonkeyBoomerangProj");
-                }
-            }
-        }
-
-        public override void OnTowerDestroyed(Tower tower)
-        {
-            /*if (tower.towerModel.name == "WizardMonkey-Paragon")
-            {
-                InGame.instance.GetTowerManager().DestroyTower(InGame.instance.GetTowers().First(x => x.towerModel.name == "MagicParagons-PlaceHolder2Tower"), InGame.instance.bridge.MyPlayerNumber);
-            }*/
-        }
-
-        public override void OnTowerUpgraded(Tower tower, string upgradeName, TowerModel newBaseTowerModel)
-        {
-            /*if (upgradeName == "WizardMonkey Paragon")
-            {
-                InGame.instance.GetTowerManager().CreateTower(
-                    Game.instance.model.GetTowerFromId("MagicParagons-PlaceHolder2Tower"),
-                    InGame.instance.GetTowers().First(x => x.towerModel.name == "WizardMonkey-Paragon").Position,
-                    InGame.instance.bridge.MyPlayerNumber, ObjectId.FromString("3422"), ObjectId.FromString("3422"),
-                    null, false, false, 0);
-            }*/
-
-            if (upgradeName == "SuperMonkey Paragon" && VTSGDown)
-            {
-                MelonLogger.Msg("Good");
-                tower.towerModel.ApplyDisplay<SuperMonkeyParagon.MekhaneTheCelestialDisplayVengful>(); 
-                var RightArm = tower.towerModel.GetAttackModels()[0];
-                RightArm.GetDescendant<DisplayModel>().ApplyDisplay<SuperMonkeyParagon.RightArmDisplayVengful>();
-                var LeftArm = tower.towerModel.GetAttackModels()[1];
-                LeftArm.GetDescendant<DisplayModel>().ApplyDisplay<SuperMonkeyParagon.RightArmDisplayVengful>();
-            }
-        }
-
-        [HarmonyLib.HarmonyPatch(typeof(TSMThemeDefault), nameof(TSMThemeDefault.TowerInfoChanged))]
-        private static class TSMThemeDefault_TowerInfoChanged
-        {
-            [HarmonyLib.HarmonyPostfix]
-            private static void Postfix(TSMThemeDefault __instance, TowerToSimulation tower)
-            {
-                TowerGuidsDown = new List<String>();
-                foreach (var inGameTower in InGame.instance.GetTowers())
-                {
-                    TowerGuidsDown.Add(inGameTower?.towerModel?.display?.guidRef?? "null");
-                }
-
-                if (TowerGuidsDown.Contains("e7bedca86ea05784fa030678549a9f79"))
-                {
-                    VTSGDown = true;
-                }
-                else
-                {
-                    VTSGDown = false;
-                }
-            }
         }
     }
 }
