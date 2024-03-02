@@ -447,11 +447,7 @@ namespace MagicParagons
                     foreach (var renderer in node.genericRenderers)
                     {
                         renderer.SetOutlineColor(new Color(15f / 255, 50f / 255, 89f / 255));
-                        if (renderer == node.genericRenderers.Last())
-                        {
-
-                        }
-                        else
+                        if (renderer != node.genericRenderers.Last())
                         {
                             renderer.material.mainTexture = GetTexture("AlchemistParagonDisplay");
                         }
