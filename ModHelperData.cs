@@ -2,8 +2,8 @@
 {
     public static class ModHelperData
     {
-        public const string WorksOnVersion = "41.2";
-        public const string Version = "1.0.2";
+        public const string WorksOnVersion = "42.0";
+        public const string Version = "1.0.3";
         public const string Name = "Magic Paragons";
         public const string Description =
             "This mod adds paragons for all of the magic towers. <br><br>" +
